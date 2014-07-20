@@ -2,7 +2,10 @@ import Text.Parsec
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Expr
 import qualified Data.Map as M
+import Data.Maybe (fromMaybe)
 
+--I am using http://hackage.haskell.org/package/ParserFunction-0.0.8/docs/src/Text-ParserCombinators-Parsec-ParserFunction.html  
+--as the basis for my expression evaluator. 
 
 --flow of data
 --Input: String 
@@ -25,15 +28,15 @@ import qualified Data.Map as M
 --Define a recursive data type for expression which represents the only valid
 --strings that an Expr can take
 data Expr = 	  Num Double	| Var Char 	| Sub Expr Expr
-          		| Div Expr Expr 	| Mul Expr Expr 	| Add Expr Expr 
-          		| Exp Expr deriving (Show, Eq)
+          		| Div Expr Expr 	| Mul Expr Expr 	| Add Expr Expr  deriving (Show, Eq)
 
 --Takes an Expr, parses it and then evaluates the expression
 evaluateExpression :: String -> [(Char, Double)] -> Double
-evaluateExpression = undefined
+evaluateExpression s m = evaluate (M.fromList m) (fromMaybe ( error "Parser error in the expression") (stringToExpr s) )
 
+--convert a string to an expression
 stringToExpr :: String -> Maybe Expr
-stringToExpr = undefined
+stringToExpr x = either (const Nothing) (Just) (parse buildExpr "" ( "(" ++ (filter (/= ' ')  x) ++ ")" ))
 
 --will start to parse a Expr. 
 buildExpr :: Parser Expr
@@ -48,9 +51,7 @@ expressionTable =  [
     where
         operationInfix s function assoc = Infix  (do{ string s; return function}) assoc
 
-
-  
- --parse a expression. If not valid we then parse a number
+--parse a expression. If not valid we then parse a number
 factor :: Parser Expr
 factor = do 
  	char '(' 
@@ -59,7 +60,6 @@ factor = do
 	return x
      	<|> variables
   
-
 --parse a variable. If not variable we then parse a number. 
 --variables can only be size of 1
 variables :: Parser Expr
@@ -87,5 +87,12 @@ number = do
 
 --takes an expression and a Map of variables and the variables value 
 --and then evaluate the expression.
-evaluate :: M.Map String Double -> Expr -> Double
-evaluate = undefined
+evaluate :: M.Map Char Double -> Expr -> Double
+evaluate m expression = 
+	case expression of 
+		(Num d)			->	d
+		(Var x)				->	fromMaybe (error ("Variable lookup failed") ) (M.lookup x m)
+		(Add exprLeft exprRight)	-> 	(evaluate m exprLeft) + (evaluate m exprRight)
+		(Sub exprLeft exprRight)	-> 	(evaluate m exprLeft) - (evaluate m exprRight)
+		(Mul exprLeft exprRight)	-> 	(evaluate m exprLeft) * (evaluate m exprRight)
+		(Div exprLeft exprRight)	-> 	(evaluate m exprLeft) / (evaluate m exprRight)

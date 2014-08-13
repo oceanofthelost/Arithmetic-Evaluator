@@ -2,7 +2,7 @@ module Parser where
 
 import           Text.ParserCombinators.Parsec hiding ((<|>),many)
 import           Text.ParserCombinators.Parsec.Expr
-import 			 Control.Applicative 
+import 			 Control.Applicative
 import           Types
 
 --will start to parse a Expr.

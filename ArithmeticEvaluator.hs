@@ -11,11 +11,14 @@ import 			 Evaluator
 --Flow from Input to Output
 --evaluateExpression -> stringToExpr -> makeExpression -> Parsers -> evaluate
 
---TODO:
---write functions:
-	--evaluateExpression
-	--stringToExpr
-	--evaluate
+
+--TODO
+	--Refactor factor function in Parser.hs to not use do. See If I can use applicative
+	--Write a String -> (Var,Double)
+	--Add more math operations
+	--Add math constants
+	--Maybe create a tokenizer for parser
+	--Create a GUI
 
 --rewright monad interface as an applicitive interface
 --I can use http://stackoverflow.com/questions/15123552/translate-from-monad-to-applicative

@@ -1,23 +1,23 @@
 module Parser where
 
+
 import           Text.ParserCombinators.Parsec hiding ((<|>),many)
 import           Text.ParserCombinators.Parsec.Expr
-import 			 Control.Applicative
+import           Control.Applicative
 import           Types
 
 --will start to parse a Expr.
 buildExpr :: Parser Expr
-buildExpr = buildExpressionParser expressionTable factor
-    <?> "expression"
+buildExpr = buildExpressionParser expressionTable factor <?> "expression"
 
 
 --We create a table of operators and there associativity
 expressionTable :: [[Operator Char st Expr]]
 expressionTable =
-	[
- 		[operationInfix "*" Mul AssocLeft, operationInfix "/" Div AssocLeft],
-		[operationInfix "+" Add AssocLeft, operationInfix "-" Sub AssocLeft]
-	]
+    [
+        [operationInfix "*" Mul AssocLeft, operationInfix "/" Div AssocLeft],
+        [operationInfix "+" Add AssocLeft, operationInfix "-" Sub AssocLeft]
+    ]
     where
         operationInfix s function assoc = Infix  (do{ string s; return function}) assoc
 
@@ -33,28 +33,14 @@ factor = do
     <?> "simple expression"
 
 
---parse a variable. If not variable we then parse a number.
---variables can only be size of 1
+--variable parser 
 variables :: Parser Expr
-variables = do
-    ds <- letter
-    return (Var ds)
-    <?> "variable"
+variables = Var <$> letter <?> "variable"
 
---Had lots of problems getting my number parser working. So I used the one
---on http://hackage.haskell.org/package/ParserFunction-0.0.8/docs/src/Text-ParserCombinators-Parsec-ParserFunction.html
---to implement the number parser.
+
+--parser for numbers
 number :: Parser Expr
-number = (Num . read) <$> (many1 digit)
---number = many1 digit >>= \ ds -> return (Num (read ds)) <?> "number"
-{-
-number = do
-    ds <- many1 digit
-    return (Num (read ds))
-    <?> "number"
--}
-
-
+number = (Num . read) <$> (many1 digit) <?> "number"
 
 --convert a string to an expression using maybe
 stringToExpr :: String -> Maybe Expr

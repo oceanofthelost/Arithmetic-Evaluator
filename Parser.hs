@@ -45,7 +45,7 @@ variables = do
 --on http://hackage.haskell.org/package/ParserFunction-0.0.8/docs/src/Text-ParserCombinators-Parsec-ParserFunction.html
 --to implement the number parser.
 number :: Parser Expr
-number = (Num . read) <?> (many1 digit)
+number = (Num . read) <$> (many1 digit)
 --number = many1 digit >>= \ ds -> return (Num (read ds)) <?> "number"
 {-
 number = do
